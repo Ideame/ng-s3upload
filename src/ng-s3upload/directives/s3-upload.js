@@ -61,18 +61,17 @@ angular.module('ngS3upload.directives', []).
                   }
 
                   var s3Uri = 'https://' + bucket + '.s3.amazonaws.com/';
-                  var key = opts.folder + (new Date()).getTime() + '-' + S3Uploader.randomString(16) + "." + ext;
                   S3Uploader.upload(scope,
                       s3Uri,
-                      key,
-                      opts.acl,
-                      selectedFile.type,
-                      s3Options.key,
-                      s3Options.policy,
-                      s3Options.signature,
+                      s3Options.fileKey,
+                      s3Options.acl,
+                      selectedFile.contentType,
+                      s3Options.s3Key,
+                      s3Options.s3PolicyBase64,
+                      s3Options.s3Signature,
                       selectedFile
                     ).then(function () {
-                      ngModel.$setViewValue(s3Uri + key);
+                      ngModel.$setViewValue(s3Options.fileUrl);
                       scope.filename = ngModel.$viewValue;
 
                       if (opts.enableValidation) {

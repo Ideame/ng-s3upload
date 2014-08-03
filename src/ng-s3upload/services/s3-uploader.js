@@ -31,7 +31,7 @@ angular.module('ngS3upload.services', []).
       var fd = new FormData();
       fd.append('key', key);
       fd.append('acl', acl);
-      fd.append('Content-Type', file.type);
+      fd.append('Content-Type', type);
       fd.append('AWSAccessKeyId', accessKey);
       fd.append('policy', policy);
       fd.append('signature', signature);
