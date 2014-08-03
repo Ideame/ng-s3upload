@@ -205,7 +205,7 @@ angular.module('ngS3upload.directives', []).
                       s3Uri,
                       s3Options.fileKey,
                       s3Options.acl,
-                      selectedFile.contentType,
+                      s3Options.contentType,
                       s3Options.s3Key,
                       s3Options.s3PolicyBase64,
                       s3Options.s3Signature,
