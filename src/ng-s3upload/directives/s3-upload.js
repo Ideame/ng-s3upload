@@ -1,5 +1,5 @@
-angular.module('ngS3upload.directives', []).
-  directive('s3Upload', ['$parse', 'S3Uploader', function ($parse, S3Uploader) {
+angular.module('ngS3upload.directives').
+  directive('s3Upload', ['$parse', 'S3Uploader', 'ngS3Config', 'ngS3UploadConfig', function ($parse, S3Uploader, ngS3Config, ngS3UploadConfig) {
     return {
       restrict: 'AC',
       require: '?ngModel',
@@ -11,10 +11,8 @@ angular.module('ngS3upload.directives', []).
         $scope.success = false;
         $scope.uploading = false;
 
-        $scope.barClass = function () {
-          return {
-            "bar-success": $scope.attempt && !$scope.uploading && $scope.success
-          };
+        $scope.isUploadSuccessful = function(){
+          return $scope.attempt && !$scope.uploading && $scope.success;
         };
       }],
       compile: function (element, attr, linker) {
@@ -30,11 +28,13 @@ angular.module('ngS3upload.directives', []).
             opts = angular.extend({
               submitOnChange: true,
               getOptionsUri: '/getS3Options',
+              getManualOptions: null,
               acl: 'public-read',
               uploadingKey: 'uploading',
               folder: '',
-              enableValidation: true
-            }, opts);
+              enableValidation: true,
+              targetFilename: null
+            }, ngS3UploadConfig, opts);
             var bucket = scope.$eval(attrs.bucket);
 
             scope.chooseFileLabel = attrs.chooseFileLabel || 'Choose file';
@@ -59,11 +59,20 @@ angular.module('ngS3upload.directives', []).
               var filename = selectedFile.name;
               var ext = filename.split('.').pop();
 
-              scope.$apply(function () {
+              if(angular.isObject(opts.getManualOptions)) {
+                _upload(opts.getManualOptions);
+              } else {
                 S3Uploader.getUploadOptions(opts.getOptionsUri).then(function (s3Options) {
-                  if (opts.enableValidation) {
-                    ngModel.$setValidity('uploading', false);
-                  }
+                  _upload(s3Options);
+                }, function (error) {
+                  throw Error("Can't receive the needed options for S3 " + error);
+                });
+              }
+
+              function _upload(s3Options){
+                if (opts.enableValidation) {
+                  ngModel.$setValidity('uploading', false);
+                }
 
                   var s3Uri = 'https://' + bucket + '.s3.amazonaws.com/';
                   S3Uploader.upload(scope,
@@ -79,30 +88,34 @@ angular.module('ngS3upload.directives', []).
                       ngModel.$setViewValue(s3Options.fileUrl);
                       scope.filename = ngModel.$viewValue;
 
-                      if (opts.enableValidation) {
-                        ngModel.$setValidity('uploading', true);
-                        ngModel.$setValidity('succeeded', true);
-                      }
-                    }, function () {
-                      scope.filename = ngModel.$viewValue;
+                    if (opts.enableValidation) {
+                      ngModel.$setValidity('uploading', true);
+                      ngModel.$setValidity('succeeded', true);
+                    }
+                  }, function () {
+                    scope.filename = ngModel.$viewValue;
 
-                      if (opts.enableValidation) {
-                        ngModel.$setValidity('uploading', true);
-                        ngModel.$setValidity('succeeded', false);
-                      }
-                    });
-
-                }, function (error) {
-                  throw Error("Can't receive the needed options for S3 " + error);
-                });
-              });
+                    if (opts.enableValidation) {
+                      ngModel.$setValidity('uploading', true);
+                      ngModel.$setValidity('succeeded', false);
+                    }
+                  });
+              }
             };
 
             element.bind('change', function (nVal) {
               if (opts.submitOnChange) {
-                uploadFile();
+                scope.$apply(function () {
+                  uploadFile();
+                });
               }
             });
+
+            if (angular.isDefined(attrs.doUpload)) {
+              scope.$watch(attrs.doUpload, function(value) {
+                if (value) uploadFile();
+              });
+            }
           }
         };
       },
@@ -113,6 +126,15 @@ angular.module('ngS3upload.directives', []).
         '<div class="bar" style="width: {{ progress }}%;" ng-class="barClass()"></div>' +
         '</div>' +
         '<input type="file" style="display: none"/>' +
-        '</div>'
+        '</div>',
+      templateUrl: function(elm, attrs) {
+        var theme = attrs.theme || ngS3Config.theme;
+
+        if(theme.indexOf('/') === -1){
+          return 'theme/' + theme + '.html';
+        } else {
+          return theme;
+        }
+      }
     };
   }]);
