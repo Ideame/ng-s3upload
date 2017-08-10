@@ -70,9 +70,7 @@ angular.module('ngS3upload.directives').
                 }
 
                 var s3Uri = 'https://' + bucket + '.s3.amazonaws.com/';
-                // var key = opts.targetFilename ? scope.$eval(opts.targetFilename) : opts.folder + (new Date()).getTime() + '-' + S3Uploader.randomString(16) + "." + ext;
-                var key = s3Options.fileKey;
-                
+                var key = opts.targetFilename ? scope.$eval(opts.targetFilename) : opts.folder + (new Date()).getTime() + '-' + S3Uploader.randomString(16) + "." + ext;
                 S3Uploader.upload(scope,
                     s3Uri,
                     key,
@@ -118,9 +116,7 @@ angular.module('ngS3upload.directives').
         };
       },
       templateUrl: function(elm, attrs) {
-        var theme = attrs.theme || ngS3Config.theme || 'ideame';
-
-        console.log('themeUrl', theme);
+        var theme = attrs.theme || ngS3Config.theme;
 
         if(theme.indexOf('/') === -1){
           return 'theme/' + theme + '.html';

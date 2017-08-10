@@ -1,0 +1,8 @@
+<div class="upload-wrap">
+    <button class="{{ buttonClass }}" type="button"><span ng-if="!filename">{{ chooseFileLabel }}</span><span ng-if="filename">{{ replaceFileLabel }}</span></button>
+    <a ng-href="{{ filename  }}" target="_blank" class="" ng-if="filename" >{{ storedFileLabel }}</a>
+    <div class="progress progress-striped" ng-class="{active: uploading}" ng-show="attempt" style="margin-top: 10px">
+    <div class="bar" style="width: {{ progress }}%;" ng-class="barClass()"></div>
+    </div>
+    <input type="file" style="display: none"/>
+</div>
