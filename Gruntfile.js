@@ -111,8 +111,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
 
   grunt.registerTask('test', ['jshint', 'karma:unit']);
-  // grunt.registerTask('default', ['clean:dist','jshint:beforeConcat', 'ngtemplates', 'concat', 'jshint:afterConcat', 'uglify']);
-  grunt.registerTask('default', ['clean:dist','jshint:beforeConcat', 'ngtemplates', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean:dist','jshint:beforeConcat', 'ngtemplates', 'concat', 'jshint:afterConcat', 'uglify']);
   grunt.registerTask('livereload', ['default', 'watch']);
 
 };
