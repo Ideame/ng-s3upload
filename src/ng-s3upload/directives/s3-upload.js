@@ -77,10 +77,10 @@ angular.module('ngS3upload.directives').
                     s3Uri,
                     key,
                     opts.acl,
-                    selectedFile.type,
-                    s3Options.key,
-                    s3Options.policy,
-                    s3Options.signature,
+                    s3Options.contentType,
+                    s3Options.s3Key,
+                    s3Options.s3PolicyBase64,
+                    s3Options.s3Signature,
                     selectedFile
                   ).then(function () {
                     ngModel.$setViewValue(s3Uri + key);
